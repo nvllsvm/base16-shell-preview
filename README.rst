@@ -11,7 +11,12 @@ A script to browse and preview `Base16 Shell <https://github.com/chriskempson/ba
 Installation
 ------------
 
-For an environment with Python 2 or Python 3, use the following to install.
+Requires:
+
+- Python 2 or Python 3 installed
+- A Base16 Shell theme is active
+
+Use the following to install.
 
 .. code:: shell
 
