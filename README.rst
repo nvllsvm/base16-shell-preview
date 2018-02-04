@@ -11,12 +11,7 @@ A tool to preview and enable `Base16 Shell <https://github.com/chriskempson/base
 Installation
 ------------
 
-Requires:
-
-- Python 2 or Python 3 installed
-- A Base16 Shell theme is active
-
-Use the following to install.
+Requires Python. Base16 Shell must also be present and a theme must be enabled.
 
 .. code:: shell
 
