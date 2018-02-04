@@ -3,7 +3,7 @@ Base16 Shell Preview
 
 |PyPi Version|
 
-A script to browse and preview `Base16 Shell <https://github.com/chriskempson/base16-shell>`_ themes in your terminal.
+A tool to preview and enable `Base16 Shell <https://github.com/chriskempson/base16-shell>`_ themes in your terminal.
 
 .. image:: https://raw.githubusercontent.com/nvllsvm/base16-shell-preview/master/preview.gif
    :alt: Preview GIF
