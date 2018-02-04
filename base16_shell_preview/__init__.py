@@ -5,6 +5,8 @@ import subprocess
 CURRENT_THEME = os.readlink(os.path.expanduser('~/.base16_theme'))
 BASE16_SCRIPTS_DIR = os.path.split(CURRENT_THEME)[0]
 
+SHELL = os.environ['SHELL']
+
 NUM_COLORS = 22
 
 
@@ -19,8 +21,11 @@ class Theme(object):
         filename = os.path.split(self.path)[1]
         self.name = filename.replace('base16-', '', 1)[:-3]
 
-    def apply(self):
-        subprocess.Popen(['sh', self.path])
+    def run_script(self):
+        subprocess.Popen([SHELL, self.path])
+
+    def run_alias(self):
+        subprocess.Popen([SHELL, '-ic', 'base16_{}'.format(self.name)])
 
 
 class PreviewWindow(object):
@@ -118,7 +123,7 @@ def main():
     scroll_list_win.set_data(sorted(themes.keys()))
     scroll_list_win.render()
 
-    themes[scroll_list_win.value].apply()
+    themes[scroll_list_win.value].run_script()
 
     while True:
         scroll_list_win.render()
@@ -127,12 +132,16 @@ def main():
 
         if c == curses.KEY_DOWN:
             scroll_list_win.down()
-            themes[scroll_list_win.value].apply()
+            themes[scroll_list_win.value].run_script()
         elif c == curses.KEY_UP:
             scroll_list_win.up()
-            themes[scroll_list_win.value].apply()
+            themes[scroll_list_win.value].run_script()
         elif c == ord('q'):
             end_run()
+        elif c == ord('\n'):
+            theme = themes[scroll_list_win.value]
+            theme.run_alias()
+            end_run(theme)
         elif c == curses.KEY_RESIZE:
             if curses.LINES < NUM_COLORS:
                 raise ValueError('Terminal has less than 22 lines.')
@@ -141,10 +150,12 @@ def main():
                     total_cols))
 
 
-def end_run():
+def end_run(theme=None):
+    if theme is None:
+        theme = Theme(CURRENT_THEME)
     try:
         curses.endwin()
-        Theme(CURRENT_THEME).apply()
+        theme.run_script()
         exit()
     except KeyboardInterrupt:
         end_run()
