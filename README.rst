@@ -20,7 +20,7 @@ Use the following to install.
 
 .. code:: shell
 
-    $ pip install base16_shell_preview
+    $ pip install base16-shell-preview
 
 Usage
 -----
