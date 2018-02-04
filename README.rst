@@ -20,17 +20,23 @@ Use the following to install.
 
 .. code:: shell
 
-    pip install base16_shell_preview
+    $ pip install base16_shell_preview
 
 Usage
 -----
 
-It can be run with the following.
-Themes are selected using the up and down arrows. Press **q** to quit.
+.. code::
 
-.. code:: shell
+    $ base16-shell-preview -h
+    usage: base16-shell-preview [-h]
 
-    base16-shell-preview
+    keys:
+      up/down  select and preview theme
+      q        quit
+      enter    enable theme and quit
+
+    optional arguments:
+      -h, --help  show this help message and exit
 
 
 .. |PyPi Version| image:: https://img.shields.io/pypi/v/base16_shell_preview.svg?

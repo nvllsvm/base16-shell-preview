@@ -1,3 +1,4 @@
+import argparse
 import curses
 import os
 import subprocess
@@ -99,7 +100,7 @@ class ScrollListWindow(object):
         self.window.refresh()
 
 
-def main():
+def run_curses_app():
     stdscr = curses.initscr()
     stdscr.refresh()
     stdscr.keypad(True)
@@ -161,8 +162,20 @@ def end_run(theme=None):
         end_run()
 
 
-if __name__ == '__main__':
+def main():
+    argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
+                            description="""
+keys:
+  up/down  select and preview theme
+  q        quit
+  enter    enable theme and quit
+""").parse_args()
+
     try:
-        main()
+        run_curses_app()
     except KeyboardInterrupt:
         end_run()
+
+
+if __name__ == '__main__':
+    main()
