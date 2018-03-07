@@ -26,9 +26,11 @@ Usage
     usage: base16-shell-preview [-h]
 
     keys:
-      up/down  select and preview theme
-      q        quit
-      enter    enable theme and quit
+      up/down      move 1
+      pgup/pgdown  move page
+      home/end     go to beginning/end
+      q            quit
+      enter        enable theme and quit
 
     optional arguments:
       -h, --help  show this help message and exit
