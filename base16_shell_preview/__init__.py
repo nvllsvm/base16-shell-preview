@@ -77,6 +77,22 @@ class ScrollListWindow(object):
             self.selected += 1
         self.render()
 
+    def up_page(self):
+        for i in range(NUM_COLORS):
+            self.up()
+
+    def down_page(self):
+        for i in range(NUM_COLORS):
+            self.down()
+
+    def top(self):
+        for i in range(len(self.data)):
+            self.up()
+
+    def bottom(self):
+        for i in range(len(self.data)):
+            self.down()
+
     def render(self):
         end = self.offset + self.lines
 
@@ -137,6 +153,18 @@ def run_curses_app():
         elif c == curses.KEY_UP:
             scroll_list_win.up()
             themes[scroll_list_win.value].run_script()
+        elif c == curses.KEY_PPAGE:
+            scroll_list_win.up_page()
+            themes[scroll_list_win.value].run_script()
+        elif c == curses.KEY_NPAGE:
+            scroll_list_win.down_page()
+            themes[scroll_list_win.value].run_script()
+        elif c == curses.KEY_HOME:
+            scroll_list_win.top()
+            themes[scroll_list_win.value].run_script()
+        elif c == curses.KEY_END:
+            scroll_list_win.bottom()
+            themes[scroll_list_win.value].run_script()
         elif c == ord('q'):
             end_run()
         elif c == ord('\n'):
@@ -166,9 +194,11 @@ def main():
     argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                             description="""
 keys:
-  up/down  select and preview theme
-  q        quit
-  enter    enable theme and quit
+  up/down      move 1
+  pgup/pgdown  move page
+  home/end     go to beginning/end
+  q            quit
+  enter        enable theme and quit
 """).parse_args()
 
     try:

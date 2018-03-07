@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Next
+----
+- Add page up/page down
+- Add home/end
+
 0.2.0 (2018-02-04)
 ------------------
 - Permanently enable theme with enter key
