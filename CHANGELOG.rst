@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Next
-----
+0.3.0 (2018-03-07)
+------------------
 - Add page up/page down
 - Add home/end
 
