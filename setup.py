@@ -7,7 +7,7 @@ setuptools.setup(
     description='Browse and preview Base16 Shell themes in your terminal.',
     long_description=open('README.rst').read(),
     author='Andrew Rabert',
-    author_email='arabert@nullsum.net',
+    author_email='ar@nullsum.net',
     url='https://github.com/nvllsvm/base16-shell-preview',
     license='MIT',
     packages=['base16_shell_preview'],
