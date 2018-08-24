@@ -11,13 +11,13 @@ setuptools.setup(
     url='https://github.com/nvllsvm/base16-shell-preview',
     license='MIT',
     packages=['base16_shell_preview'],
-    classifiers=(
+    classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3'
-    ),
+    ],
     entry_points={
         'console_scripts': ['base16-shell-preview=base16_shell_preview:main']
     }
