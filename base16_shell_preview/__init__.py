@@ -3,6 +3,8 @@ import curses
 import os
 import subprocess
 
+import pkg_resources
+
 CURRENT_THEME = os.readlink(os.path.expanduser('~/.base16_theme'))
 BASE16_SCRIPTS_DIR = os.path.split(CURRENT_THEME)[0]
 
@@ -191,15 +193,22 @@ def end_run(theme=None):
 
 
 def main():
-    argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
-                            description="""
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawTextHelpFormatter,
+        description="""
 keys:
   up/down      move 1
   pgup/pgdown  move page
   home/end     go to beginning/end
   q            quit
   enter        enable theme and quit
-""").parse_args()
+""")
+    parser.add_argument(
+        '--version',
+        action='version',
+        version=pkg_resources.get_distribution('base16-shell-preview').version
+    )
+    parser.parse_args()
 
     try:
         run_curses_app()

@@ -34,6 +34,7 @@ Usage
 
     optional arguments:
       -h, --help  show this help message and exit
+      --version   show program's version number and exit
 
 
 .. |PyPi Version| image:: https://img.shields.io/pypi/v/base16_shell_preview.svg?
