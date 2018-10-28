@@ -3,7 +3,6 @@ import setuptools
 
 setuptools.setup(
     name='base16_shell_preview',
-    version='0.3.0',
     description='Browse and preview Base16 Shell themes in your terminal.',
     long_description=open('README.rst').read(),
     author='Andrew Rabert',
@@ -20,5 +19,7 @@ setuptools.setup(
     ],
     entry_points={
         'console_scripts': ['base16-shell-preview=base16_shell_preview:main']
-    }
+    },
+    setup_requires=['setuptools_scm'],
+    use_scm_version=True
 )
