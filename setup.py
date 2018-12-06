@@ -21,5 +21,6 @@ setuptools.setup(
         'console_scripts': ['base16-shell-preview=base16_shell_preview:main']
     },
     setup_requires=['setuptools_scm'],
-    use_scm_version=True
+    use_scm_version=True,
+    python_requires='>=2.7'
 )
