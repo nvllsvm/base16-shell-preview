@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.4.0 (2019-06-05)
+------------------
+- Add --version flag
+- Fix fish shell
+
 0.3.0 (2018-03-07)
 ------------------
 - Add page up/page down
