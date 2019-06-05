@@ -1,6 +1,7 @@
 import argparse
 import curses
 import os
+import pwd
 import subprocess
 
 import pkg_resources
@@ -9,7 +10,7 @@ CURRENT_THEME = os.readlink(os.path.expanduser('~/.base16_theme'))
 BASE16_SCRIPTS_DIR = os.path.split(CURRENT_THEME)[0]
 
 SCRIPT_SHELL = '/bin/sh'
-USER_SHELL = os.environ['SHELL']
+USER_SHELL = os.environ.get('SHELL', pwd.getpwuid(os.getuid()).pw_shell)
 
 NUM_COLORS = 22
 
