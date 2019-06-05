@@ -8,7 +8,8 @@ import pkg_resources
 CURRENT_THEME = os.readlink(os.path.expanduser('~/.base16_theme'))
 BASE16_SCRIPTS_DIR = os.path.split(CURRENT_THEME)[0]
 
-SHELL = os.environ['SHELL']
+SCRIPT_SHELL = '/bin/sh'
+USER_SHELL = os.environ['SHELL']
 
 NUM_COLORS = 22
 
@@ -25,10 +26,10 @@ class Theme(object):
         self.name = filename.replace('base16-', '', 1)[:-3]
 
     def run_script(self):
-        subprocess.Popen([SHELL, self.path])
+        subprocess.Popen([SCRIPT_SHELL, self.path])
 
     def run_alias(self):
-        subprocess.Popen([SHELL, '-ic', 'base16_{}'.format(self.name)])
+        subprocess.Popen([USER_SHELL, '-ic', 'base16_{}'.format(self.name)])
 
 
 class PreviewWindow(object):
