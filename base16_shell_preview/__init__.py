@@ -17,6 +17,8 @@ SHELL = '/bin/sh'
 
 NUM_COLORS = 22
 
+DEVNULL = open(os.devnull, 'w')
+
 
 def get_themes(scripts_dir):
     return [Theme(os.path.join(scripts_dir, f))
@@ -43,8 +45,8 @@ class Theme(object):
                 if os.path.isfile(path) and os.access(path, os.X_OK):
                     subprocess.Popen(
                         [path],
-                        stderr=subprocess.DEVNULL,
-                        stdout=subprocess.DEVNULL
+                        stderr=DEVNULL,
+                        stdout=DEVNULL
                     )
 
 
