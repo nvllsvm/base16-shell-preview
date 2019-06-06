@@ -211,6 +211,7 @@ def end_run(theme=None):
 
 def main():
     parser = argparse.ArgumentParser(
+        'base16-shell-preview',
         formatter_class=argparse.RawTextHelpFormatter,
         description="""
 keys:
