@@ -19,7 +19,9 @@ setuptools.setup(
         'Programming Language :: Python :: 3'
     ],
     entry_points={
-        'console_scripts': ['base16-shell-preview=base16_shell_preview:main']
+        'console_scripts': [
+            'base16-shell-preview=base16_shell_preview.__main__:main'
+        ]
     },
     python_requires='>=2.7'
 )
