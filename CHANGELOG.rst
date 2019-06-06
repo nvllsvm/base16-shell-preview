@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Next
+----
+- Create symlink when activating theme (works with all shells)
+- Add support for env var BASE16_SHELL_HOOKS script directory
+- Fix execution when script not installed
+
 0.4.0 (2019-06-05)
 ------------------
 - Add --version flag
