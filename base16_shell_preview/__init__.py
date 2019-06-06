@@ -40,11 +40,14 @@ class Theme(object):
 
         hooks_dir = os.environ.get('BASE16_SHELL_HOOKS')
         if hooks_dir and os.path.isdir(hooks_dir):
+            env = os.environ.copy()
+            env['BASE16_THEME'] = self.name
             for name in os.listdir(hooks_dir):
                 path = os.path.join(hooks_dir, name)
                 if os.path.isfile(path) and os.access(path, os.X_OK):
                     subprocess.Popen(
                         [path],
+                        env=env,
                         stderr=DEVNULL,
                         stdout=DEVNULL
                     )
