@@ -191,10 +191,12 @@ def run_curses_app():
             themes[scroll_list_win.value].run_script()
         elif c == ord('q'):
             end_run()
+            return
         elif c == ord('\n'):
             theme = themes[scroll_list_win.value]
             theme.install_theme()
             end_run(theme)
+            return
         elif c == curses.KEY_RESIZE:
             if curses.LINES < NUM_COLORS:
                 raise ValueError('Terminal has less than 22 lines.')
@@ -209,7 +211,6 @@ def end_run(theme=None):
     try:
         curses.endwin()
         theme.run_script()
-        exit()
     except KeyboardInterrupt:
         end_run()
 
