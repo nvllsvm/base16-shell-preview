@@ -3,7 +3,11 @@ import curses
 import os
 import subprocess
 
-import pkg_resources
+try:
+    import pkg_resources
+    VERSION = pkg_resources.get_distribution('base16-shell-preview').version
+except Exception:
+    VERSION = 'unknown'
 
 THEME_PATH = os.path.expanduser('~/.base16_theme')
 CURRENT_THEME = os.readlink(THEME_PATH)
@@ -219,7 +223,7 @@ keys:
     parser.add_argument(
         '--version',
         action='version',
-        version=pkg_resources.get_distribution('base16-shell-preview').version
+        version=VERSION
     )
     parser.parse_args()
 
