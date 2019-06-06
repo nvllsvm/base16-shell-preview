@@ -1,16 +1,15 @@
 import argparse
 import curses
 import os
-import pwd
 import subprocess
 
 import pkg_resources
 
-CURRENT_THEME = os.readlink(os.path.expanduser('~/.base16_theme'))
+THEME_PATH = os.path.expanduser('~/.base16_theme')
+CURRENT_THEME = os.readlink(THEME_PATH)
 BASE16_SCRIPTS_DIR = os.path.split(CURRENT_THEME)[0]
 
-SCRIPT_SHELL = '/bin/sh'
-USER_SHELL = os.environ.get('SHELL', pwd.getpwuid(os.getuid()).pw_shell)
+SHELL = '/bin/sh'
 
 NUM_COLORS = 22
 
@@ -27,10 +26,11 @@ class Theme(object):
         self.name = filename.replace('base16-', '', 1)[:-3]
 
     def run_script(self):
-        subprocess.Popen([SCRIPT_SHELL, self.path])
+        subprocess.Popen([SHELL, self.path])
 
-    def run_alias(self):
-        subprocess.Popen([USER_SHELL, '-ic', 'base16_{}'.format(self.name)])
+    def install_theme(self):
+        os.remove(THEME_PATH)
+        os.symlink(self.path, THEME_PATH)
 
 
 class PreviewWindow(object):
@@ -173,7 +173,7 @@ def run_curses_app():
             end_run()
         elif c == ord('\n'):
             theme = themes[scroll_list_win.value]
-            theme.run_alias()
+            theme.install_theme()
             end_run(theme)
         elif c == curses.KEY_RESIZE:
             if curses.LINES < NUM_COLORS:
