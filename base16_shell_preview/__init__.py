@@ -32,6 +32,17 @@ class Theme(object):
         os.remove(THEME_PATH)
         os.symlink(self.path, THEME_PATH)
 
+        hooks_dir = os.environ.get('BASE16_SHELL_HOOKS')
+        if hooks_dir and os.path.isdir(hooks_dir):
+            for name in os.listdir(hooks_dir):
+                path = os.path.join(hooks_dir, name)
+                if os.path.isfile(path) and os.access(path, os.X_OK):
+                    subprocess.Popen(
+                        [path],
+                        stderr=subprocess.DEVNULL,
+                        stdout=subprocess.DEVNULL
+                    )
+
 
 class PreviewWindow(object):
     def __init__(self, lines, cols, *args, **kwargs):
