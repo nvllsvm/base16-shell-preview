@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.5.1 (2019-06-06)
+------------------
+- Read Base16 Shell path from BASE16_SHELL when no theme is active
+
 0.5.0 (2019-06-06)
 ------------------
 - Create symlink when activating theme (works with all shells)
