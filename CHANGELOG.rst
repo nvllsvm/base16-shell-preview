@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Next
+----
+- Add --sort-bg flag to sort on background color (starting with darkest)
+
 0.5.1 (2019-06-06)
 ------------------
 - Read Base16 Shell path from BASE16_SHELL when no theme is active

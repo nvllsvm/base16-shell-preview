@@ -51,6 +51,18 @@ class Theme(object):
                         stdout=DEVNULL
                     )
 
+    @property
+    def bg_color(self):
+        with open(self.path) as f:
+            lines = f.readlines()
+        background_line = [
+            line
+            for line in lines
+            if line.startswith('color00')
+        ][0]
+        background_str = background_line.split('"')[1].replace('/', '')
+        return hex(int(background_str, 16))
+
 
 class PreviewWindow(object):
     def __init__(self, lines, cols, *args, **kwargs):
@@ -139,7 +151,7 @@ class ScrollListWindow(object):
         self.window.refresh()
 
 
-def run_curses_app(scripts_dir):
+def run_curses_app(scripts_dir, sort_bg):
     stdscr = curses.initscr()
     stdscr.refresh()
     stdscr.keypad(True)
@@ -149,6 +161,14 @@ def run_curses_app(scripts_dir):
     curses.noecho()
 
     themes = {s.name: s for s in get_themes(scripts_dir)}
+    sort_key = 'bg_color' if sort_bg else 'name'
+    sorted_themes = sorted(
+        themes.values(), key=lambda x: (getattr(x, sort_key), x.name)
+    )
+    sorted_keys = [
+        theme.name
+        for theme in sorted_themes
+    ]
 
     scroll_list_cols = 35
     preview_cols = 42
@@ -160,7 +180,7 @@ def run_curses_app(scripts_dir):
 
     preview_win.render()
 
-    scroll_list_win.set_data(sorted(themes.keys()))
+    scroll_list_win.set_data(sorted_keys)
     scroll_list_win.render()
 
     themes[scroll_list_win.value].run_script()
@@ -231,7 +251,11 @@ keys:
         action='version',
         version=VERSION
     )
-    parser.parse_args()
+    parser.add_argument(
+        '--sort-bg',
+        action='store_true'
+    )
+    args = parser.parse_args()
 
     base16_shell_dir = os.environ.get('BASE16_SHELL')
     if not base16_shell_dir:
@@ -250,7 +274,7 @@ keys:
     scripts_dir = os.path.join(base16_shell_dir, 'scripts')
 
     try:
-        run_curses_app(scripts_dir)
+        run_curses_app(scripts_dir, args.sort_bg)
     except KeyboardInterrupt:
         end_run()
 
