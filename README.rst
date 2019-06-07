@@ -3,7 +3,7 @@ Base16 Shell Preview
 
 |PyPi Version|
 
-A tool to preview and enable `Base16 Shell <https://github.com/chriskempson/base16-shell>`_ themes in your terminal.
+A tool to preview and enable `Base16 Shell`_ themes in your terminal.
 
 .. image:: https://raw.githubusercontent.com/nvllsvm/base16-shell-preview/master/preview.gif
    :alt: Preview GIF
@@ -11,7 +11,7 @@ A tool to preview and enable `Base16 Shell <https://github.com/chriskempson/base
 Installation
 ------------
 
-Requires Python. Base16 Shell must also be present and a theme must be enabled.
+Requires Python. Base16 Shell must also be present.
 
 .. code:: shell
 
@@ -19,6 +19,9 @@ Requires Python. Base16 Shell must also be present and a theme must be enabled.
 
 Usage
 -----
+
+Before running, ensure that the ``BASE16_SHELL`` environment variable is set to the local
+`Base16 Shell`_ path or that a theme is already symlinked to ``~/.base16_theme``.
 
 .. code::
 
@@ -39,3 +42,5 @@ Usage
 
 .. |PyPi Version| image:: https://img.shields.io/pypi/v/base16_shell_preview.svg?
    :target: https://pypi.python.org/pypi/base16_shell_preview
+
+.. _Base16 Shell: https://github.com/chriskempson/base16-shell
