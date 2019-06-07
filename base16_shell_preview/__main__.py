@@ -10,8 +10,6 @@ except Exception:
     VERSION = 'unknown'
 
 THEME_PATH = os.path.expanduser('~/.base16_theme')
-CURRENT_THEME = os.readlink(THEME_PATH)
-BASE16_SCRIPTS_DIR = os.path.split(CURRENT_THEME)[0]
 
 SHELL = '/bin/sh'
 
@@ -35,7 +33,8 @@ class Theme(object):
         subprocess.Popen([SHELL, self.path])
 
     def install_theme(self):
-        os.remove(THEME_PATH)
+        if os.path.exists(THEME_PATH):
+            os.remove(THEME_PATH)
         os.symlink(self.path, THEME_PATH)
 
         hooks_dir = os.environ.get('BASE16_SHELL_HOOKS')
@@ -140,7 +139,7 @@ class ScrollListWindow(object):
         self.window.refresh()
 
 
-def run_curses_app():
+def run_curses_app(scripts_dir):
     stdscr = curses.initscr()
     stdscr.refresh()
     stdscr.keypad(True)
@@ -149,7 +148,7 @@ def run_curses_app():
     curses.curs_set(0)
     curses.noecho()
 
-    themes = {s.name: s for s in get_themes(BASE16_SCRIPTS_DIR)}
+    themes = {s.name: s for s in get_themes(scripts_dir)}
 
     scroll_list_cols = 35
     preview_cols = 42
@@ -207,7 +206,7 @@ def run_curses_app():
 
 def end_run(theme=None):
     if theme is None:
-        theme = Theme(CURRENT_THEME)
+        theme = Theme(THEME_PATH)
     try:
         curses.endwin()
         theme.run_script()
@@ -234,8 +233,24 @@ keys:
     )
     parser.parse_args()
 
+    base16_shell_dir = os.environ.get('BASE16_SHELL')
+    if not base16_shell_dir:
+        if os.path.islink(THEME_PATH):
+            base16_shell_dir = os.path.dirname(
+                os.path.dirname(
+                    os.readlink(THEME_PATH)
+                    )
+            )
+    if not base16_shell_dir:
+        parser.error(
+            'please set the BASE16_SHELL environment variable '
+            'to the local repository path.'
+        )
+
+    scripts_dir = os.path.join(base16_shell_dir, 'scripts')
+
     try:
-        run_curses_app()
+        run_curses_app(scripts_dir)
     except KeyboardInterrupt:
         end_run()
 
