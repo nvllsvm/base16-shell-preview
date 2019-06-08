@@ -1,9 +1,10 @@
 Changelog
 =========
 
-Next
-----
+0.6.0 (2019-06-07)
+------------------
 - Add --sort-bg flag to sort on background color (starting with darkest)
+- Fix exiting when no theme selected and ~/.base16_shell does not exist
 
 0.5.1 (2019-06-06)
 ------------------
