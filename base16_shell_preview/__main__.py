@@ -225,11 +225,12 @@ def run_curses_app(scripts_dir, sort_bg):
 
 
 def end_run(theme=None):
-    if theme is None:
+    if theme is None and os.path.exists(THEME_PATH):
         theme = Theme(THEME_PATH)
     try:
         curses.endwin()
-        theme.run_script()
+        if theme:
+            theme.run_script()
     except KeyboardInterrupt:
         end_run()
 
