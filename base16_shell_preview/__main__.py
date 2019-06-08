@@ -254,7 +254,8 @@ keys:
     )
     parser.add_argument(
         '--sort-bg',
-        action='store_true'
+        action='store_true',
+        help='sort themes by background (darkest to lightest)'
     )
     args = parser.parse_args()
 
