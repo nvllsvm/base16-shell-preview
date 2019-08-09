@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.6.1 (2019-08-08)
+------------------
+- Add empty __init__.py to package
+
 0.6.0 (2019-06-07)
 ------------------
 - Add --sort-bg flag to sort on background color (starting with darkest)
