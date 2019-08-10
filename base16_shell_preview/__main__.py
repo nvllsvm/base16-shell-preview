@@ -1,7 +1,9 @@
 import argparse
 import curses
 import os
+import signal
 import subprocess
+import sys
 
 try:
     import pkg_resources
@@ -227,12 +229,15 @@ def run_curses_app(scripts_dir, sort_bg):
 def end_run(theme=None):
     if theme is None and os.path.exists(THEME_PATH):
         theme = Theme(THEME_PATH)
-    try:
-        curses.endwin()
-        if theme:
-            theme.run_script()
-    except KeyboardInterrupt:
-        end_run()
+
+    curses.endwin()
+    if theme:
+        theme.run_script()
+
+
+def _exit_signal_handler(*_):
+    end_run()
+    sys.exit()
 
 
 def main():
@@ -259,6 +264,9 @@ keys:
     )
     args = parser.parse_args()
 
+    for signalnum in [signal.SIGINT, signal.SIGTERM]:
+        signal.signal(signalnum, _exit_signal_handler)
+
     base16_shell_dir = os.environ.get('BASE16_SHELL')
     if not base16_shell_dir:
         if os.path.islink(THEME_PATH):
@@ -275,10 +283,7 @@ keys:
 
     scripts_dir = os.path.join(base16_shell_dir, 'scripts')
 
-    try:
-        run_curses_app(scripts_dir, args.sort_bg)
-    except KeyboardInterrupt:
-        end_run()
+    run_curses_app(scripts_dir, args.sort_bg)
 
 
 if __name__ == '__main__':
