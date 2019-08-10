@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.6.2 (2019-08-10)
+------------------
+- Restore original theme upon SIGINT or SIGTERM
+
 0.6.1 (2019-08-08)
 ------------------
 - Add empty __init__.py to package
