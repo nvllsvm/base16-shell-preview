@@ -35,8 +35,10 @@ class Theme(object):
         subprocess.Popen([SHELL, self.path])
 
     def install_theme(self):
-        if os.path.exists(THEME_PATH):
+        try:
             os.remove(THEME_PATH)
+        except FileNotFoundError:
+            pass
         os.symlink(self.path, THEME_PATH)
 
         hooks_dir = os.environ.get('BASE16_SHELL_HOOKS')
