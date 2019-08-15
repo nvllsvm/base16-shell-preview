@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.6.3 (2019-08-14)
+------------------
+- Fix error when current theme symlink is broken
+
 0.6.2 (2019-08-10)
 ------------------
 - Restore original theme upon SIGINT or SIGTERM
