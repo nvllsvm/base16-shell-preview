@@ -180,6 +180,10 @@ class ThemePreviewer(ScrollListWindow):
     def format_right(theme):
         pass
 
+    def render(self):
+        super().render()
+        self.value.apply()
+
 
 def run_curses_app(stdscr, scripts_dir, sort_bg):
     stdscr.refresh()
@@ -218,22 +222,18 @@ def run_curses_app(stdscr, scripts_dir, sort_bg):
         curses.KEY_END: win.bottom,
     }
 
-    win.value.apply()
-
     while True:
         win.render()
         c = stdscr.getch()
 
         if c in movement_map:
             movement_map[c]()
-            win.value.apply()
         elif c == ord('q'):
             end_run()
             return
         elif c == ord('\n'):
-            theme = win.value
-            theme.install()
-            end_run(theme)
+            win.value.install()
+            end_run()
             return
         elif c == curses.KEY_RESIZE:
             if curses.LINES < win.lines:
@@ -243,13 +243,10 @@ def run_curses_app(stdscr, scripts_dir, sort_bg):
                     total_cols))
 
 
-def end_run(theme=None):
-    if theme is None and os.path.exists(THEME_PATH):
-        theme = Theme(THEME_PATH)
-
+def end_run(*_):
     curses.endwin()
-    if theme:
-        theme.apply()
+    if os.path.exists(THEME_PATH):
+        Theme(THEME_PATH).apply()
 
 
 def _exit_signal_handler(*_):
