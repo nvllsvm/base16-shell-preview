@@ -1,6 +1,8 @@
 import argparse
 import curses
+import functools
 import os
+import pathlib
 import signal
 import subprocess
 import sys
@@ -11,55 +13,52 @@ try:
 except Exception:
     VERSION = 'unknown'
 
-THEME_PATH = os.path.expanduser('~/.base16_theme')
+THEME_PATH = pathlib.Path('~/.base16_theme').expanduser()
 
 SHELL = '/bin/sh'
 
 NUM_COLORS = 22
 
 
-def get_themes(scripts_dir):
-    return [Theme(os.path.join(scripts_dir, f))
-            for f in sorted(os.listdir(scripts_dir))]
-
-
 class Theme:
     def __init__(self, path):
-        self.path = path
-        filename = os.path.split(self.path)[1]
-        self.name = filename.replace('base16-', '', 1)[:-3]
+        self.path = pathlib.Path(path)
+
+        self.name = self.path.stem
+        prefix = 'base16-'
+        if self.name.startswith(prefix):
+            self.name = self.name[len(prefix):]
 
     def apply(self):
-        subprocess.Popen([SHELL, self.path])
+        subprocess.run([SHELL, self.path], check=True)
 
     def install(self):
         try:
-            os.remove(THEME_PATH)
+            THEME_PATH.unlink()
         except FileNotFoundError:
             pass
-        os.symlink(self.path, THEME_PATH)
+        THEME_PATH.symlink_to(self.path)
 
         hooks_dir = os.environ.get('BASE16_SHELL_HOOKS')
-        if hooks_dir and os.path.isdir(hooks_dir):
+        if hooks_dir is not None:
             env = os.environ.copy()
             env['BASE16_THEME'] = self.name
-            for name in os.listdir(hooks_dir):
-                path = os.path.join(hooks_dir, name)
-                if os.path.isfile(path) and os.access(path, os.X_OK):
-                    subprocess.Popen(
+            for path in pathlib.Path(hooks_dir).iterdir():
+                if path.is_file():
+                    subprocess.run(
                         [path],
                         env=env,
                         stderr=subprocess.DEVNULL,
-                        stdout=subprocess.DEVNULL
+                        stdout=subprocess.DEVNULL,
+                        check=True
                     )
 
     @property
+    @functools.lru_cache()
     def bg_color(self):
-        with open(self.path) as f:
-            lines = f.readlines()
         background_line = [
             line
-            for line in lines
+            for line in self.path.read_text().split('\n')
             if line.startswith('color00')
         ][0]
         background_str = background_line.split('"')[1].replace('/', '')
@@ -193,7 +192,9 @@ def run_curses_app(stdscr, scripts_dir, sort_bg):
 
     sort_key = 'bg_color' if sort_bg else 'name'
     sorted_themes = sorted(
-        get_themes(scripts_dir),
+        [Theme(path)
+         for path in scripts_dir.iterdir()
+         if path.is_file()],
         key=lambda x: (getattr(x, sort_key), x.name)
     )
 
@@ -242,7 +243,7 @@ def run_curses_app(stdscr, scripts_dir, sort_bg):
 
 def end_run(*_):
     curses.endwin()
-    if os.path.exists(THEME_PATH):
+    if THEME_PATH.exists():
         Theme(THEME_PATH).apply()
 
 
@@ -279,22 +280,19 @@ keys:
         signal.signal(signalnum, _exit_signal_handler)
 
     base16_shell_dir = os.environ.get('BASE16_SHELL')
-    if not base16_shell_dir:
-        if os.path.islink(THEME_PATH):
-            base16_shell_dir = os.path.dirname(
-                os.path.dirname(
-                    os.readlink(THEME_PATH)
-                    )
+    if base16_shell_dir is not None:
+        base16_shell_dir = pathlib.Path(base16_shell_dir)
+    else:
+        if THEME_PATH.is_symlink():
+            base16_shell_dir = THEME_PATH.resolve().parent.parent
+        else:
+            parser.error(
+                'please set the BASE16_SHELL environment variable '
+                'to the local repository path.'
             )
-    if not base16_shell_dir:
-        parser.error(
-            'please set the BASE16_SHELL environment variable '
-            'to the local repository path.'
-        )
 
-    scripts_dir = os.path.join(base16_shell_dir, 'scripts')
-
-    curses.wrapper(run_curses_app, scripts_dir, args.sort_bg)
+    curses.wrapper(
+        run_curses_app, base16_shell_dir.joinpath('scripts'), args.sort_bg)
 
 
 if __name__ == '__main__':
