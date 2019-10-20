@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.0.0 (2019-10-20)
+------------------
+- Improve scrolling performance
+- Check exit code of subprocesses
+- Drop support for Python < 3.6
+
 0.6.3 (2019-08-14)
 ------------------
 - Fix error when current theme symlink is broken

@@ -11,7 +11,7 @@ A tool to preview and enable `Base16 Shell`_ themes in your terminal.
 Installation
 ------------
 
-Requires Python. Base16 Shell must also be present.
+Requires Python 3.6+. Base16 Shell must also be present.
 
 .. code:: shell
 
