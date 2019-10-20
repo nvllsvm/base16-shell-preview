@@ -15,7 +15,6 @@ setuptools.setup(
         'Development Status :: 4 - Beta',
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3'
     ],
     entry_points={
@@ -23,5 +22,5 @@ setuptools.setup(
             'base16-shell-preview=base16_shell_preview.__main__:main'
         ]
     },
-    python_requires='>=2.7'
+    python_requires='>=3.6'
 )

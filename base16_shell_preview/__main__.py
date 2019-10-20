@@ -17,15 +17,13 @@ SHELL = '/bin/sh'
 
 NUM_COLORS = 22
 
-DEVNULL = open(os.devnull, 'w')
-
 
 def get_themes(scripts_dir):
     return [Theme(os.path.join(scripts_dir, f))
             for f in sorted(os.listdir(scripts_dir))]
 
 
-class Theme(object):
+class Theme:
     def __init__(self, path):
         self.path = path
         filename = os.path.split(self.path)[1]
@@ -51,8 +49,8 @@ class Theme(object):
                     subprocess.Popen(
                         [path],
                         env=env,
-                        stderr=DEVNULL,
-                        stdout=DEVNULL
+                        stderr=subprocess.DEVNULL,
+                        stdout=subprocess.DEVNULL
                     )
 
     @property
@@ -68,7 +66,7 @@ class Theme(object):
         return hex(int(background_str, 16))
 
 
-class ScrollListWindow(object):
+class ScrollListWindow:
     def __init__(self, data, lines, left_cols, right_cols):
         self.data = data
 
@@ -162,7 +160,7 @@ class ScrollListWindow(object):
     def _render_right(self):
         for i in range(self.lines):
             curses.init_pair(i, i, -1)
-            text = 'color{:02d} '.format(i)
+            text = f'color{i:02d} '
             spaces = self.right_cols - len(text) - 1
 
             self.right_window.addstr(i, len(text), spaces*' ',
@@ -239,8 +237,7 @@ def run_curses_app(stdscr, scripts_dir, sort_bg):
             if curses.LINES < win.lines:
                 raise ValueError('Terminal has less than 22 lines.')
             elif curses.COLS < total_cols:
-                raise ValueError('Terminal has less than {} cols.'.format(
-                    total_cols))
+                raise ValueError(f'Terminal has less than {total_cols} cols.')
 
 
 def end_run(*_):
