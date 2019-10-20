@@ -31,10 +31,10 @@ class Theme(object):
         filename = os.path.split(self.path)[1]
         self.name = filename.replace('base16-', '', 1)[:-3]
 
-    def run_script(self):
+    def apply(self):
         subprocess.Popen([SHELL, self.path])
 
-    def install_theme(self):
+    def install(self):
         try:
             os.remove(THEME_PATH)
         except FileNotFoundError:
@@ -68,73 +68,77 @@ class Theme(object):
         return hex(int(background_str, 16))
 
 
-class PreviewWindow(object):
-    def __init__(self, lines, cols, *args, **kwargs):
-        self.lines = lines
-        self.cols = cols
-        self.window = curses.newwin(lines, cols, *args, **kwargs)
-
-    def render(self):
-        for i in range(NUM_COLORS):
-            curses.init_pair(i, i, -1)
-            text = 'color{:02d} '.format(i)
-            spaces = self.cols - len(text) - 1
-
-            self.window.addstr(i, len(text), spaces*' ',
-                               curses.color_pair(i) + curses.A_REVERSE)
-            self.window.addstr(i, 0, text, curses.color_pair(i))
-
-        self.window.refresh()
-
-
 class ScrollListWindow(object):
-    def __init__(self, lines, cols, *args, **kwargs):
+    def __init__(self, data, lines, left_cols, right_cols):
+        self.data = data
+
         self.lines = lines
-        self.cols = cols
+        self.left_cols = left_cols
+        self.right_cols = right_cols
 
         self.offset = 0
         self.selected = 0
-        self.window = curses.newwin(lines, cols, **kwargs)
-        self.data = []
-
-    def set_data(self, data):
-        self.data = data
+        self.left_window = curses.newwin(lines, left_cols)
+        self.right_window = curses.newwin(lines, right_cols, 0, self.left_cols)
 
     def up(self):
-        if self.selected > 0:
-            self.selected -= 1
-        elif self.offset != 0:
-            self.offset -= 1
+        self.index -= 1
         self.render()
 
+    @property
+    def index(self):
+        return self.offset + self.selected
+
+    @index.setter
+    def index(self, index):
+        if index < 0:
+            index = 0
+        elif index >= len(self.data):
+            index = len(self.data) - 1
+
+        if index < (self.index):
+            diff = self.index - index
+
+            available = self.selected
+            self.selected -= min(diff, available)
+        elif index > (self.index):
+            diff = index - self.index
+
+            available = self.lines - 1 - self.selected
+            self.selected += min(diff, available)
+
+        self.offset = index - self.selected
+
     def down(self):
-        if (self.offset + self.selected) > (len(self.data) - 2):
-            pass
-        elif self.selected == (self.lines - 1):
-            self.offset += 1
-        else:
-            self.selected += 1
+        self.index += 1
         self.render()
 
     def up_page(self):
-        for i in range(NUM_COLORS):
-            self.up()
+        self.selected = 0
+        self.index -= self.lines
+        self.render()
 
     def down_page(self):
-        for i in range(NUM_COLORS):
-            self.down()
+        self.selected = self.lines - 1
+        self.index += self.lines
+        self.render()
 
     def top(self):
-        for i in range(len(self.data)):
-            self.up()
+        self.index = 0
+        self.render()
 
     def bottom(self):
-        for i in range(len(self.data)):
-            self.down()
+        self.index = len(self.data) - 1
+        self.render()
 
     def render(self):
-        end = self.offset + self.lines
+        self._render_left()
+        self._render_right()
+        self.left_window.refresh()
+        self.right_window.refresh()
 
+    def _render_left(self):
+        end = self.offset + self.lines
         line = 0
         for i, value in enumerate(self.data):
             if i < self.offset:
@@ -148,15 +152,36 @@ class ScrollListWindow(object):
             else:
                 attrs = 0
 
-            self.window.addstr(line, 0, (self.cols - 1) * ' ', attrs)
-            self.window.addstr(line, 0, value[:self.cols-1], attrs)
+            self.left_window.addstr(
+                line, 0, (self.left_cols - 1) * ' ', attrs)
+            self.left_window.addstr(
+                line, 0, self.format_left(value)[:self.left_cols-1],
+                attrs)
             line += 1
 
-        self.window.refresh()
+    def _render_right(self):
+        for i in range(self.lines):
+            curses.init_pair(i, i, -1)
+            text = 'color{:02d} '.format(i)
+            spaces = self.right_cols - len(text) - 1
+
+            self.right_window.addstr(i, len(text), spaces*' ',
+                                     curses.color_pair(i) + curses.A_REVERSE)
+            self.right_window.addstr(i, 0, text, curses.color_pair(i))
 
 
-def run_curses_app(scripts_dir, sort_bg):
-    stdscr = curses.initscr()
+class ThemePreviewer(ScrollListWindow):
+
+    @staticmethod
+    def format_left(theme):
+        return theme.name
+
+    @staticmethod
+    def format_right(theme):
+        pass
+
+
+def run_curses_app(stdscr, scripts_dir, sort_bg):
     stdscr.refresh()
     stdscr.keypad(True)
     curses.start_color()
@@ -164,64 +189,54 @@ def run_curses_app(scripts_dir, sort_bg):
     curses.curs_set(0)
     curses.noecho()
 
-    themes = {s.name: s for s in get_themes(scripts_dir)}
     sort_key = 'bg_color' if sort_bg else 'name'
     sorted_themes = sorted(
-        themes.values(), key=lambda x: (getattr(x, sort_key), x.name)
+        get_themes(scripts_dir),
+        key=lambda x: (getattr(x, sort_key), x.name)
     )
-    sorted_keys = [
-        theme.name
-        for theme in sorted_themes
-    ]
 
     scroll_list_cols = 35
     preview_cols = 42
 
     total_cols = scroll_list_cols + preview_cols
 
-    scroll_list_win = ScrollListWindow(NUM_COLORS, scroll_list_cols)
-    preview_win = PreviewWindow(NUM_COLORS, preview_cols, 0, scroll_list_cols)
+    win = ThemePreviewer(
+        sorted_themes,
+        NUM_COLORS,
+        scroll_list_cols,
+        preview_cols,
+    )
 
-    preview_win.render()
+    win.render()
 
-    scroll_list_win.set_data(sorted_keys)
-    scroll_list_win.render()
+    movement_map = {
+        curses.KEY_DOWN: win.down,
+        curses.KEY_UP: win.up,
+        curses.KEY_PPAGE: win.up_page,
+        curses.KEY_NPAGE: win.down_page,
+        curses.KEY_HOME: win.top,
+        curses.KEY_END: win.bottom,
+    }
 
-    themes[scroll_list_win.value].run_script()
+    win.value.apply()
 
     while True:
-        scroll_list_win.render()
-        preview_win.render()
+        win.render()
         c = stdscr.getch()
 
-        if c == curses.KEY_DOWN:
-            scroll_list_win.down()
-            themes[scroll_list_win.value].run_script()
-        elif c == curses.KEY_UP:
-            scroll_list_win.up()
-            themes[scroll_list_win.value].run_script()
-        elif c == curses.KEY_PPAGE:
-            scroll_list_win.up_page()
-            themes[scroll_list_win.value].run_script()
-        elif c == curses.KEY_NPAGE:
-            scroll_list_win.down_page()
-            themes[scroll_list_win.value].run_script()
-        elif c == curses.KEY_HOME:
-            scroll_list_win.top()
-            themes[scroll_list_win.value].run_script()
-        elif c == curses.KEY_END:
-            scroll_list_win.bottom()
-            themes[scroll_list_win.value].run_script()
+        if c in movement_map:
+            movement_map[c]()
+            win.value.apply()
         elif c == ord('q'):
             end_run()
             return
         elif c == ord('\n'):
-            theme = themes[scroll_list_win.value]
-            theme.install_theme()
+            theme = win.value
+            theme.install()
             end_run(theme)
             return
         elif c == curses.KEY_RESIZE:
-            if curses.LINES < NUM_COLORS:
+            if curses.LINES < win.lines:
                 raise ValueError('Terminal has less than 22 lines.')
             elif curses.COLS < total_cols:
                 raise ValueError('Terminal has less than {} cols.'.format(
@@ -234,7 +249,7 @@ def end_run(theme=None):
 
     curses.endwin()
     if theme:
-        theme.run_script()
+        theme.apply()
 
 
 def _exit_signal_handler(*_):
@@ -285,7 +300,7 @@ keys:
 
     scripts_dir = os.path.join(base16_shell_dir, 'scripts')
 
-    run_curses_app(scripts_dir, args.sort_bg)
+    curses.wrapper(run_curses_app, scripts_dir, args.sort_bg)
 
 
 if __name__ == '__main__':
