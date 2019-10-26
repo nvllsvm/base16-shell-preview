@@ -1,9 +1,11 @@
 import setuptools
 
+import base16_shell_preview
+
 
 setuptools.setup(
     name='base16_shell_preview',
-    version='1.0.0',
+    version=base16_shell_preview.__version__,
     description='Browse and preview Base16 Shell themes in your terminal.',
     long_description=open('README.rst').read(),
     author='Andrew Rabert',

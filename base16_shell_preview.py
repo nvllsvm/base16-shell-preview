@@ -7,11 +7,7 @@ import signal
 import subprocess
 import sys
 
-try:
-    import pkg_resources
-    VERSION = pkg_resources.get_distribution('base16-shell-preview').version
-except Exception:
-    VERSION = 'unknown'
+__version__ = '1.0.0'
 
 THEME_PATH = pathlib.Path('~/.base16_theme').expanduser()
 
@@ -267,7 +263,7 @@ keys:
     parser.add_argument(
         '--version',
         action='version',
-        version=VERSION
+        version=__version__
     )
     parser.add_argument(
         '--sort-bg',
