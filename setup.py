@@ -10,7 +10,7 @@ setuptools.setup(
     author_email='ar@nullsum.net',
     url='https://github.com/nvllsvm/base16-shell-preview',
     license='MIT',
-    packages=['base16_shell_preview'],
+    py_modules=['base16_shell_preview'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: End Users/Desktop',
@@ -19,7 +19,7 @@ setuptools.setup(
     ],
     entry_points={
         'console_scripts': [
-            'base16-shell-preview=base16_shell_preview.__main__:main'
+            'base16-shell-preview=base16_shell_preview:main'
         ]
     },
     python_requires='>=3.6'
