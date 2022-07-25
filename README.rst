@@ -15,7 +15,7 @@ Requires Python 3.6+. Base16 Shell must also be present.
 
 .. code:: shell
 
-    $ pip install base16-shell-preview
+    pip install base16-shell-preview
 
 Usage
 -----
@@ -25,7 +25,7 @@ Before running, ensure that the ``BASE16_SHELL`` environment variable is set to 
 
 .. code::
 
-   $ base16-shell-preview -h
+   base16-shell-preview -h
    usage: base16-shell-preview [-h] [--version] [--sort-bg]
 
    keys:
