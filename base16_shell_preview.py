@@ -239,7 +239,6 @@ def run_curses_app(stdscr, scripts_dir, sort_bg):
 
 
 def end_run(*_):
-    curses.endwin()
     if THEME_PATH.exists():
         Theme(THEME_PATH).apply()
 
