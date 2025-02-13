@@ -166,6 +166,14 @@ class ScrollListWindow:
 
 class ThemePreviewer(ScrollListWindow):
 
+    def __init__(self, *args, selected_theme, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.theme_indexes = {}
+        for i, theme in enumerate(self.data):
+            self.theme_indexes[theme.name] = i
+        if selected_theme:
+            self.index = self.theme_indexes[selected_theme.name]
+
     @staticmethod
     def format_left(theme):
         return theme.name
@@ -179,7 +187,7 @@ class ThemePreviewer(ScrollListWindow):
         self.value.apply()
 
 
-def run_curses_app(stdscr, scripts_dir, sort_bg):
+def run_curses_app(stdscr, themes):
     stdscr.refresh()
     stdscr.keypad(True)
     curses.start_color()
@@ -187,24 +195,17 @@ def run_curses_app(stdscr, scripts_dir, sort_bg):
     curses.curs_set(0)
     curses.noecho()
 
-    sort_key = 'bg_color' if sort_bg else 'name'
-    sorted_themes = sorted(
-        [Theme(path)
-         for path in scripts_dir.iterdir()
-         if path.is_file()],
-        key=lambda x: (getattr(x, sort_key), x.name)
-    )
-
     scroll_list_cols = 35
     preview_cols = 42
 
     total_cols = scroll_list_cols + preview_cols
 
     win = ThemePreviewer(
-        sorted_themes,
+        themes,
         NUM_COLORS,
         scroll_list_cols,
         preview_cols,
+        selected_theme=get_installed_theme(),
     )
 
     win.render()
@@ -238,9 +239,15 @@ def run_curses_app(stdscr, scripts_dir, sort_bg):
                 raise ValueError(f'Terminal has less than {total_cols} cols.')
 
 
-def end_run(*_):
+def get_installed_theme():
     if THEME_PATH.exists():
-        Theme(THEME_PATH).apply()
+        return Theme(THEME_PATH.readlink())
+
+
+def end_run(*_):
+    theme = get_installed_theme()
+    if theme:
+        theme.apply()
 
 
 def _exit_signal_handler(*_):
@@ -270,6 +277,16 @@ keys:
         action='store_true',
         help='sort themes by background (darkest to lightest)'
     )
+    parser.add_argument(
+        '-l', '--list',
+        action='store_true',
+        help='print a list of themes and exit'
+    )
+    parser.add_argument(
+        'theme',
+        nargs='?',
+        help='set this theme and exit'
+    )
     args = parser.parse_args()
 
     for signalnum in [signal.SIGINT, signal.SIGTERM]:
@@ -287,8 +304,30 @@ keys:
                 'to the local repository path.'
             )
 
-    curses.wrapper(
-        run_curses_app, base16_shell_dir.joinpath('scripts'), args.sort_bg)
+    sort_key = 'bg_color' if args.sort_bg else 'name'
+    scripts_dir = base16_shell_dir.joinpath('scripts')
+    themes = sorted(
+        [Theme(path)
+         for path in scripts_dir.iterdir()
+         if path.is_file()],
+        key=lambda x: (getattr(x, sort_key), x.name)
+    )
+
+    if args.theme:
+        found_theme = None
+        for theme in themes:
+            if theme.name == args.theme:
+                found_theme = theme
+                break
+        if found_theme:
+            found_theme.apply()
+            found_theme.install()
+        else:
+            parser.error('theme not found')
+    elif args.list:
+        print('\n'.join(theme.name for theme in themes))
+    else:
+        curses.wrapper(run_curses_app, themes)
 
 
 if __name__ == '__main__':
