@@ -1,6 +1,16 @@
 Changelog
 =========
 
+1.1.0 (2025-02-12)
+------------------
+- Add `-l`, `--list` option to print themes and exit
+- Add optional positional argument to set current theme and exit
+- Start preview listing on current theme when possible
+
+1.0.1 (2025-02-12)
+------------------
+- Fix curses.endwin exception on exit
+
 1.0.0 (2019-10-20)
 ------------------
 - Improve scrolling performance
